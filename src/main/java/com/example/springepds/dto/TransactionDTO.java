@@ -7,6 +7,8 @@ import java.util.List;
 
 @Data
 public class TransactionDTO {
+    private Long id;
     private Date createdAt;
+    private String clientPhone;
     private List<CartItemDTO> orderItems;
 }

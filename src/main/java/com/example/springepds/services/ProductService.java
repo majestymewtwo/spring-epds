@@ -82,18 +82,18 @@ public class ProductService {
         User user = userRepository.findByPhone(AuthContext.getCurrentUser()).orElseThrow(
                 () -> new Exception("User not found")
         );
-        if(user.getCart().isEmpty())
-            return;
+        List<Cart> cartList = cartRepository.findAllByUserPhone(AuthContext.getCurrentUser());
         Transaction transaction = new Transaction();
         transaction.setUser(user);
         transaction.setCreatedAt(new Date());
         List<OrderItem> orderItems = new ArrayList<>();
-        for(Cart cartItem : user.getCart()) {
+        for(Cart cartItem : cartList) {
             OrderItem orderItem = new OrderItem();
             orderItem.setProduct(cartItem.getProduct());
             orderItem.setQuantity(cartItem.getQuantity());
             orderItem.setTransaction(transaction);
             orderItems.add(orderItem);
+            cartRepository.delete(cartItem);
         }
         transaction.setOrderItems(orderItems);
         transactionRepository.save(transaction);
@@ -104,6 +104,8 @@ public class ProductService {
         for(Transaction transaction : transactions) {
             TransactionDTO transactionDTO = new TransactionDTO();
             transactionDTO.setCreatedAt(transaction.getCreatedAt());
+            transactionDTO.setId(transaction.getId());
+            transactionDTO.setClientPhone(transaction.getUser().getPhone());
             List<CartItemDTO> orderDTOS = new ArrayList<>();
             for(OrderItem orderItem : transaction.getOrderItems()) {
                 CartItemDTO orderDTO = new CartItemDTO();
@@ -112,6 +114,7 @@ public class ProductService {
                 orderDTOS.add(orderDTO);
             }
             transactionDTO.setOrderItems(orderDTOS);
+            transactionDTOS.add(transactionDTO);
         }
         return transactionDTOS;
     }

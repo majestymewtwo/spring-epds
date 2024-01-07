@@ -34,7 +34,7 @@ public class ProductController {
     public List<CartItemDTO> getCartItems() throws Exception {
         return productService.getCartItems();
     }
-    @PutMapping("/updateCart")
+    @PostMapping("/updateCart")
     public ResponseEntity<String> updateCart(@RequestBody Cart cart) {
         productService.updateCart(cart);
         return ResponseEntity.ok("Updated Cart");

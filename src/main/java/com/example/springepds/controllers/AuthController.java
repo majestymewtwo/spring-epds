@@ -13,6 +13,10 @@ import org.springframework.web.bind.annotation.*;
 @RequestMapping("/api/auth")
 public class AuthController {
     private final AuthService authService;
+    @GetMapping("")
+    public String test() {
+        return "This works";
+    }
     @PostMapping("/register")
     public JwtDTO registerUser(@RequestBody RegisterDTO registerDTO) throws Exception {
         return authService.registerCustomer(registerDTO);

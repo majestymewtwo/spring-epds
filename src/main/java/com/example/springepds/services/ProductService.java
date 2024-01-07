@@ -59,6 +59,7 @@ public class ProductService {
         for(Cart cart : cartList) {
             CartItemDTO cartItemDTO = new CartItemDTO();
             cartItemDTO.setQuantity(cart.getQuantity());
+            cartItemDTO.setProductId(cart.getProduct().getId());
             BeanUtils.copyProperties(cart.getProduct(), cartItemDTO);
             cartItemDTO.setId(cart.getId());
             cartItemDTOS.add(cartItemDTO);

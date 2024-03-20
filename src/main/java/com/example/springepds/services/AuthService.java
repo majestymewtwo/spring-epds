@@ -35,6 +35,7 @@ public class AuthService {
     private String twilioAuthToken;
     @Value("${twilio.service.sid}")
     private String serviceSid;
+
     public JwtDTO registerCustomer(RegisterDTO registerDTO) throws Exception {
         if(registerDTO.getPhone() != null) {
             Optional<User> check = userRepository.findByPhone(registerDTO.getPhone());

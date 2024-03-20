@@ -87,6 +87,8 @@ public class ProductService {
         Transaction transaction = new Transaction();
         transaction.setUser(user);
         transaction.setCreatedAt(new Date());
+        transaction.setIsDispatched(false);
+        transaction.setIsDelivered(false);
         List<OrderItem> orderItems = new ArrayList<>();
         for(Cart cartItem : cartList) {
             OrderItem orderItem = new OrderItem();
@@ -103,20 +105,43 @@ public class ProductService {
         List<Transaction> transactions = transactionRepository.findAll();
         List<TransactionDTO> transactionDTOS = new ArrayList<>();
         for(Transaction transaction : transactions) {
-            TransactionDTO transactionDTO = new TransactionDTO();
-            transactionDTO.setCreatedAt(transaction.getCreatedAt());
-            transactionDTO.setId(transaction.getId());
-            transactionDTO.setClientPhone(transaction.getUser().getPhone());
-            List<CartItemDTO> orderDTOS = new ArrayList<>();
-            for(OrderItem orderItem : transaction.getOrderItems()) {
-                CartItemDTO orderDTO = new CartItemDTO();
-                BeanUtils.copyProperties(orderItem.getProduct(), orderDTO);
-                orderDTO.setQuantity(orderItem.getQuantity());
-                orderDTOS.add(orderDTO);
-            }
-            transactionDTO.setOrderItems(orderDTOS);
+            TransactionDTO transactionDTO = mapToDTO(transaction);
             transactionDTOS.add(transactionDTO);
         }
         return transactionDTOS;
+    }
+    public void updateTransactionStatus(Long id, Integer code) {
+        Transaction transaction = transactionRepository.findById(id)
+                .orElseThrow(() -> new RuntimeException("Transaction not found"));
+        if(code.equals(1)) {
+            transaction.setIsDispatched(true);
+        }
+        else if(code.equals(-1)) {
+            transaction.setIsDelivered(true);
+        }
+    }
+    public List<TransactionDTO> getHistoryOfOrders() {
+        User user = userRepository.findByPhone(AuthContext.getCurrentUser()).orElseThrow(
+                () -> new RuntimeException("User not found")
+        );
+        return transactionRepository.findAllByUserId(user.getId())
+                .stream().map(this::mapToDTO).toList();
+    }
+    public TransactionDTO mapToDTO(Transaction transaction) {
+        TransactionDTO transactionDTO = new TransactionDTO();
+        transactionDTO.setCreatedAt(transaction.getCreatedAt());
+        transactionDTO.setId(transaction.getId());
+        transactionDTO.setIsDispatched(transaction.getIsDispatched());
+        transactionDTO.setIsDelivered(transaction.getIsDelivered());
+        transactionDTO.setClientPhone(transaction.getUser().getPhone());
+        List<CartItemDTO> orderDTOS = new ArrayList<>();
+        for(OrderItem orderItem : transaction.getOrderItems()) {
+            CartItemDTO orderDTO = new CartItemDTO();
+            BeanUtils.copyProperties(orderItem.getProduct(), orderDTO);
+            orderDTO.setQuantity(orderItem.getQuantity());
+            orderDTOS.add(orderDTO);
+        }
+        transactionDTO.setOrderItems(orderDTOS);
+        return transactionDTO;
     }
 }

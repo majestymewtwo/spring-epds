@@ -17,10 +17,6 @@ import java.util.List;
 @RequestMapping("/api/product")
 public class ProductController {
     private final ProductService productService;
-    @PostMapping("/new")
-    public Product newProduct(@RequestBody Product newProduct){
-        return productService.createNewProduct(newProduct);
-    }
     @GetMapping("/all")
     public List<Product> allProducts(){
         return productService.getAllProducts();
@@ -49,8 +45,8 @@ public class ProductController {
         productService.initiateTransaction();
         return ResponseEntity.ok("Checked out successfully");
     }
-    @GetMapping("/getOrders")
-    public List<TransactionDTO> getOrders() {
-        return productService.getOrders();
+    @GetMapping("/orderHistory")
+    public List<TransactionDTO> getOrderHistory() {
+        return productService.getHistoryOfOrders();
     }
 }

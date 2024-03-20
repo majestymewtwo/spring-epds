@@ -18,4 +18,6 @@ public class Transaction {
     private User user;
     @OneToMany(fetch = FetchType.LAZY, cascade = CascadeType.ALL, mappedBy = "transaction")
     private List<OrderItem> orderItems;
+    private Boolean isDispatched;
+    private Boolean isDelivered;
 }
